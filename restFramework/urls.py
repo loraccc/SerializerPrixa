@@ -5,9 +5,10 @@ from .views import (ItemListAPIView,ItemDetail,
                     itemList, itemDetail, itemCreate, itemUpdate, itemDelete,
                     UserRegisterView,UserLoginView)
 
+
 urlpatterns = [
     #Api 
-    path('data/', ItemListAPIView.as_view(), name='get_data'),
+    path('data/', ItemListAPIView.as_view(), name='data'),
     path('data/<int:pk>', ItemDetail.as_view(), name='view_data'),
 
     #Templates
