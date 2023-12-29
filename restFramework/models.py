@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.utils.text import slugify
+
 # Create your models here.
 
 
