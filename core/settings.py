@@ -25,7 +25,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'restFramework', #appName
+
+    #Main APP
+    'restFramework', 
+    
+    #ThirdPartyApps
     'rest_framework',
     # 'snippets',
 ]
