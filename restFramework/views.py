@@ -56,7 +56,7 @@ class itemList(LoginRequiredMixin, ListView):
     model = item
     template_name = 'item_list.html'
     login_url = 'login/'
-    
+    context_object_name = 'my_custom_name'   #overriding the context name of object_list
     # paginate_by = 2  # Specify the number of items per page
     
 
