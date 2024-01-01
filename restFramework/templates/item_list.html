@@ -7,5 +7,6 @@
       <li><a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a></li>
     {% endfor %}
   </ul>
+  
   <a href="{% url 'item-create' %}">Create Item</a>
 {% endblock %}
