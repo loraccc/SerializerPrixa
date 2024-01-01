@@ -57,12 +57,12 @@ class itemList(LoginRequiredMixin, ListView):
     template_name = 'item_list.html'
     login_url = 'login/'
     context_object_name = 'my_custom_name'   #overriding the context name of object_list
-    # paginate_by = 2  # Specify the number of items per page
+    paginate_by = 2  # Specify the number of items per page
     
 
-    # def get_queryset(self):
-    #     # print("Number of pages:", self.object_list.paginator.num_pages)
-    #     return item.objects.all().order_by('id')  
+    def get_queryset(self):
+        # print("Number of pages:", self.object_list.paginator.num_pages)
+        return item.objects.all().order_by('id')  
 
 class itemDetail(LoginRequiredMixin, DetailView):
     model = item
