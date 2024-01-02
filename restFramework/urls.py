@@ -19,10 +19,15 @@ urlpatterns = [
     path('items/<int:pk>/delete/', itemDelete.as_view(), name='item-delete'),
 
     #User Registration & login
-    path('register/', UserRegisterView.as_view(), name='register'),
-    path('login/', UserLoginView.as_view(), name='login'),
+    path('users/register/', UserRegisterView.as_view(), name='register'),
+    path('users/login/', UserLoginView.as_view(), name='login'),
 
-
+    #ECOM
+    path('', views.product_list, name='product_list'),
+    path('cart/', views.view_cart, name='view_cart'),
+    path('add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    
 
 
 ]
