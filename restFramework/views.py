@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.mail import send_mail
 
 
 # Create your views here.
@@ -107,6 +108,12 @@ class UserRegisterView(View):
             person = Person.objects.create(user=user)
             person.save()
             print("CREDENTIALS OF PERSON :",person)
+            subject = 'User Created Successfully'
+            message = f'Congratulations! A user named {{person}} has been created .'
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = ['carolacharya1@gmail.com']
+
+            send_mail(subject, message, from_email, recipient_list)
             auth_login(request, user)
             return redirect('product_list')
         return render(request, self.template_name, {'form': form})
@@ -153,4 +160,5 @@ def add_to_cart(request, product_id):
 def remove_from_cart(request, item_id):
     cart_item = CartItem.objects.get(id=item_id)
     cart_item.delete()
+
     return redirect('view_cart')
