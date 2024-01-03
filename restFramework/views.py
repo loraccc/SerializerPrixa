@@ -106,10 +106,9 @@ class UserRegisterView(View):
             user = form.save()
             person = Person.objects.create(user=user)
             person.save()
-            print('new user is ------------------------ ', person)
+            print("CREDENTIALS OF PERSON :",person)
             auth_login(request, user)
             return redirect('product_list')
-
         return render(request, self.template_name, {'form': form})
 
 class UserLoginView(LoginView):
@@ -133,7 +132,7 @@ class UserLoginView(LoginView):
             return render(request, self.template_name, {'form': form, 'login_failed': True})
 
 # ECOMMERCE 
-@login_required(login_url='/users/login/')
+# @login_required(login_url='/users/login/')
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'ecom/index.html', {'products': products})
