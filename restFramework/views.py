@@ -10,7 +10,7 @@ from rest_framework.generics import ListAPIView
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -120,26 +120,38 @@ class UserRegisterView(View):
 
 class UserLoginView(LoginView):
     template_name = 'users/login.html'
+    success_url = reverse_lazy('restFramework:product_list')
 
     def get(self, request):
         form = LoginForm()
         return render(request, self.template_name, {'form': form})
 
-    def post(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            auth_login(request, user)
-            print('user is : ', user)
-            print(f'LOGIN_URL: {settings.LOGIN_URL}')
-            return redirect('product_list')
-        else:
-            form = LoginForm(request.POST)
-            return render(request, self.template_name, {'form': form, 'login_failed': True})
+    # def post(self, request):
+    #     username = request.POST['username']
+    #     password = request.POST['password']
+    #     user = authenticate(request, username=username, password=password)
+    #     if user is not None:
+    #         auth_login(request, user)
+    #         print('user is : ', user)
+    #         print(f'LOGIN_URL: {settings.LOGIN_URL}')
+    #         return redirect('product_list')
+    #     else:
+    #         form = LoginForm(request.POST)
+    #         return render(request, self.template_name, {'form': form, 'login_failed': True})
+    def form_valid(self, form):
+        
+        auth_login(self.request, form.get_user())
+        return redirect('restFramework:product_list')
 
+    def form_invalid(self, form):
+        
+        return self.render_to_response(self.get_context_data(form=form, login_failed=True))
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
 # ECOMMERCE 
-# @login_required(login_url='/users/login/')
+@login_required(login_url='/users/login/')
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'ecom/index.html', {'products': products})

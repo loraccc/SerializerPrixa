@@ -45,10 +45,15 @@
                 <p>{{ product.description }}</p>
                 <p>Price: ${{ product.price }}</p>
                 <a href="#" class="buy-now-button">Buy Now</a>
-                <a class="buy-now-button" href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
- 
+                <a class="buy-now-button" href="{% url 'restFramework:add_to_cart' product.id %}">Add to Cart</a>
+                
             </li>
-        {% endfor %}
+            {% endfor %}
+            <button style="background-color: #dedee3;
+            height: 69px;
+            width: 64px;
+            color: red;
+            "><a href="{% url 'logout'%}">logout</a></button>
     </ul>
 </body>
 </html>
