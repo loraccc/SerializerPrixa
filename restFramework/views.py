@@ -1,4 +1,5 @@
-from django.shortcuts import render,redirect,get_object_or_404
+from django.shortcuts import render,redirect,get_object_or_404,HttpResponse
+from django.http import HttpResponseBadRequest
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import item,Person,Product,CartItem
@@ -56,7 +57,7 @@ class ItemDetail(LoginRequiredMixin,APIView):
 
 class itemList(LoginRequiredMixin, ListView):
     model = item
-    template_name = 'item_list.html'
+    template_name = 'api/item_list.html'
     login_url = 'users/login.html'
     context_object_name = 'my_custom_name'   #overriding the context name of object_list
     paginate_by = 2  # Specify the number of items per page
@@ -73,13 +74,21 @@ class itemDetail(LoginRequiredMixin, DetailView):
 
 class itemCreate(LoginRequiredMixin, CreateView):
     model = item
-    template_name = 'item_form.html'
-    fields = ['name', 'desc']
+    template_name = 'api/item_form.html'
+    fields = ['name', 'desc'    ]
     login_url = 'users/login.html'  
 
     def form_valid(self, form):
-        form.instance.owner = self.request.user.person
-        return super().form_valid(form)
+        user = self.request.user
+
+        if hasattr(user, 'person'):
+            form.instance.owner = user.person
+        else:
+            # If not, create a new Person object for the user
+            person_instance = Person.objects.create(user=user)
+            form.instance.owner = person_instance
+            print("User has no related Person object.")
+            return HttpResponseBadRequest("User has no related Person object.")
 
 class itemUpdate(LoginRequiredMixin, UpdateView):
     model = item
@@ -151,7 +160,7 @@ def logout(request):
     auth_logout(request)
     return redirect('login')
 # ECOMMERCE 
-@login_required(login_url='/users/login/')
+# @login_required(login_url='/users/login/')
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'ecom/index.html', {'products': products})
@@ -159,7 +168,8 @@ def product_list(request):
 def view_cart(request):
     cart_items = CartItem.objects.filter(user=request.user)
     total_price = sum(item.product.price * item.quantity for item in cart_items)
-    return render(request, 'ecom/cart.html', {'cart_items': cart_items, 'total_price': total_price})
+    products=Product.objects.all()
+    return render(request, 'ecom/cart.html', {'cart_items': cart_items, 'total_price': total_price,'products': products})
  
 def add_to_cart(request, product_id):
     product = Product.objects.get(id=product_id)
@@ -167,10 +177,10 @@ def add_to_cart(request, product_id):
                                                        user=request.user)
     cart_item.quantity += 1
     cart_item.save()
-    return redirect('view_cart')
+    return redirect('restFramework:view_cart')
  
 def remove_from_cart(request, item_id):
     cart_item = CartItem.objects.get(id=item_id)
     cart_item.delete()
 
-    return redirect('view_cart')
+    return redirect('restFramework:view_cart')

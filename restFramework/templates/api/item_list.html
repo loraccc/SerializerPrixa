@@ -7,8 +7,14 @@
   <ul>
     <h4>Total no of items: {% total_item %} </h4>
     {% for item in my_custom_name %}
-      <li><a href="{% url 'item-detail' pk=item.pk %}">{{ item.name }}</a></li>
+      <li><a href="{% url 'restFramework:item-list' %}">Item List</a></li>
     {% endfor %}
+    <ul>
+        {% for item_instance in my_custom_name %}
+            <li><a href="http://">{{ item_instance }}</a></li>
+        {% endfor %}
+    </ul>
+    
   </ul>
   {% if is_paginated %}
 <div class="d-flex justify-center flex-column mt-60">
@@ -52,5 +58,5 @@
 
 
 {% endif %}
-  <a href="{% url 'item-create' %}">Create Item</a>
+  <a href="{% url 'restFramework:item-create' %}">Create Item</a>
 {% endblock %}

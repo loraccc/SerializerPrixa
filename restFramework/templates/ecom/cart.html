@@ -46,20 +46,74 @@
     
  
     {% for item in cart_items %}
-    <div class="product-item">
-        <p>{{ item.product.name }} ({{ item.quantity }})</p>
+        <p>{{ item.product.name }} <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="200" height="150"></p>
         <p>Price: ${{ item.product.price }}</p>
-        <a href="{% url 'remove_from_cart' item.id %}">Remove</a>
-    </div>
+        <a href="{% url 'restFramework:remove_from_cart' item.id %}">Remove</a>
+        <p>Image URL: {{ item.product.image.url }}</p>
     {% empty %}
-    <p>Your cart is empty.</p>
+        <p>Your cart is empty.</p>
     {% endfor %}
  
     </div>
  
     <p>Total Price: ${{ total_price }}</p>
  
-    <a href="{% url 'product_list' %}">Continue Shopping</a>
+    <a href="{% url 'restFramework:product_list' %}">Continue Shopping</a>
+
+    <div id="paypal-button-container"></div>
+
+    <!-- Include the PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ATkAkDEvVurhhZsgVF9OuFKAZzwoIQzCXxEGiJoEe28FYgzYhKiYeBhJ7VU82a6Pzg2T18bzD-QrhfSl
+
+    &currency=USD"></script>
+
+    <script>
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+
+            // Call your server to set up the transaction
+            createOrder: function(data, actions) {
+                return fetch('/demo/checkout/api/paypal/order/create/', {
+                    method: 'post'
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(orderData) {
+                    return orderData.id;
+                });
+            },
+
+            // Call your server to finalize the transaction
+            onApprove: function(data, actions) {
+                return fetch('/demo/checkout/api/paypal/order/' + data.orderID + '/capture/', {
+                    method: 'post'
+                }).then(function(res) {
+                    return res.json();
+                }).then(function(orderData) {
+            
+                    var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
+
+                    if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
+                        return actions.restart(); // Recoverable state, per:
+                        // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+                    }
+
+                    if (errorDetail) {
+                        var msg = 'Sorry, your transaction could not be processed.';
+                        if (errorDetail.description) msg += '\n\n' + errorDetail.description;
+                        if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
+                        return alert(msg); // Show a failure message (try to avoid alerts in production environments)
+                    }
+
+                    // Successful capture! For demo purposes:
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                    var transaction = orderData.purchase_units[0].payments.captures[0];
+                    alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+
+                });
+            }
+
+        }).render('#paypal-button-container');
+    </script>
  
 </body>
  
