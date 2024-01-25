@@ -1,7 +1,9 @@
 from typing import Any
-from .models import Product
+from .models import Product,User
 from django.shortcuts import redirect
 import logging
+import random
+
 
 logger=logging.getLogger(__name__)
 
@@ -34,5 +36,24 @@ class ForceLoginMiddleware:
             return redirect('/users/login/')
     
         return self.get_response(request)
+    
+class RandomNumMiddleware:
+
+    def __init__(self,get_response):
+        self.get_response=get_response
+
+    def __call__(self, request):
+        response=self.get_response(request)
+
+        if request.user.is_authenticated:
+            randomnum=random.randint(1000,9999999)
+            print(f"Random Number for {request.user.username}: {randomnum}")
+
+        return response
+
+        
+
+
+
 
         
